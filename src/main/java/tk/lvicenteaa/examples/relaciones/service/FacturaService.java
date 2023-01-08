@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tk.lvicenteaa.examples.relaciones.entities.Factura;
 import tk.lvicenteaa.examples.relaciones.repository.FacturaRepository;
+import tk.lvicenteaa.examples.relaciones.util.FacturaUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,14 +21,22 @@ public class FacturaService {
         List<Factura> facturas = this.facturaRepository.findAll();
         if(facturas.isEmpty())
             return ResponseEntity.noContent().build();
-        else
+        else{
+            List<Factura> nuevaLista = new ArrayList<>();
+            for(Factura fact: facturas){
+                nuevaLista.add(FacturaUtil.calcularPrecioTotal(fact));
+            }
+
             return ResponseEntity.ok(facturas);
+        }
     }
 
     public ResponseEntity<Factura> buscarFactura(Long id){
         Optional<Factura> optFactura = this.facturaRepository.findById(id);
-        if(optFactura.isPresent())
-            return ResponseEntity.ok(optFactura.get());
+        if(optFactura.isPresent()){
+            Factura factura = FacturaUtil.calcularPrecioTotal(optFactura.get());
+            return ResponseEntity.ok(factura);
+        }
         else
             return ResponseEntity.notFound().build();
     }
@@ -35,6 +45,7 @@ public class FacturaService {
         if(factura.getId() != null)
             return ResponseEntity.badRequest().build();
         Factura result = this.facturaRepository.save(factura);
+        result = FacturaUtil.calcularPrecioTotal(result);
         return ResponseEntity.ok(result);
     }
 
@@ -49,6 +60,7 @@ public class FacturaService {
         factura1.setNumeroFactura(factura.getNumeroFactura());
         factura1.setFecha(factura.getFecha());
         Factura result = this.facturaRepository.save(factura1);
+        result = FacturaUtil.calcularPrecioTotal(result);
         return ResponseEntity.ok(result);
     }
 
@@ -63,5 +75,8 @@ public class FacturaService {
         this.facturaRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
+
+
+
 
 }

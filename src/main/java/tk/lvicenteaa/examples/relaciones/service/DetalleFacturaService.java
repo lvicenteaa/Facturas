@@ -7,7 +7,9 @@ import tk.lvicenteaa.examples.relaciones.entities.DetalleFactura;
 import tk.lvicenteaa.examples.relaciones.entities.Factura;
 import tk.lvicenteaa.examples.relaciones.repository.DetalleFacturaRepository;
 import tk.lvicenteaa.examples.relaciones.repository.FacturaRepository;
+import tk.lvicenteaa.examples.relaciones.util.DetalleFacturaUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,13 +26,21 @@ public class DetalleFacturaService {
         List<DetalleFactura> detallesFacturas = this.detalleFacturaRepository.findAll();
         if(detallesFacturas.isEmpty())
             return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(detallesFacturas);
+        List<DetalleFactura> detalleFacturas1 = new ArrayList<>();
+        for(DetalleFactura det : detallesFacturas) {
+            det = DetalleFacturaUtil.calcularPrecio(det);
+            detalleFacturas1.add(det);
+        }
+        return ResponseEntity.ok(detalleFacturas1);
     }
 
     public ResponseEntity<DetalleFactura> buscar(Long id){
         Optional<DetalleFactura> detalleFacturaOptional = this.detalleFacturaRepository.findById(id);
-        if(detalleFacturaOptional.isPresent())
-            return ResponseEntity.ok(detalleFacturaOptional.get());
+        if(detalleFacturaOptional.isPresent()){
+            DetalleFactura detalleFactura = detalleFacturaOptional.get();
+            detalleFactura = DetalleFacturaUtil.calcularPrecio(detalleFactura);
+            return ResponseEntity.ok(detalleFactura);
+        }
         return ResponseEntity.notFound().build();
     }
 
@@ -42,6 +52,7 @@ public class DetalleFacturaService {
             return ResponseEntity.notFound().build();
         detalleFactura.setFactura(optionalFactura.get());
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura);
+        result = DetalleFacturaUtil.calcularPrecio(result);
         return ResponseEntity.ok(result);
     }
 
@@ -56,6 +67,7 @@ public class DetalleFacturaService {
         detalleFactura2.setPrecio(detalleFactura.getPrecio());
 
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura2);
+        result = DetalleFacturaUtil.calcularPrecio(result);
         return ResponseEntity.ok(result);
     }
 
