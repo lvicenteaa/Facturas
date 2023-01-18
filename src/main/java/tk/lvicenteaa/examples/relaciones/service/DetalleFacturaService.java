@@ -3,6 +3,7 @@ package tk.lvicenteaa.examples.relaciones.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import tk.lvicenteaa.examples.relaciones.dto.DetalleFacturaDTO;
 import tk.lvicenteaa.examples.relaciones.entities.DetalleFactura;
 import tk.lvicenteaa.examples.relaciones.entities.Factura;
 import tk.lvicenteaa.examples.relaciones.repository.DetalleFacturaRepository;
@@ -22,29 +23,30 @@ public class DetalleFacturaService {
     @Autowired
     private FacturaRepository facturaRepository;
 
-    public ResponseEntity<List<DetalleFactura>> mostrarTodos(){
+    public ResponseEntity<List<DetalleFacturaDTO>> mostrarTodos(){
         List<DetalleFactura> detallesFacturas = this.detalleFacturaRepository.findAll();
         if(detallesFacturas.isEmpty())
             return ResponseEntity.noContent().build();
-        List<DetalleFactura> detalleFacturas1 = new ArrayList<>();
+        List<DetalleFacturaDTO> detalleFacturasDTO = new ArrayList<>();
         for(DetalleFactura det : detallesFacturas) {
-            det = DetalleFacturaUtil.calcularPrecio(det);
-            detalleFacturas1.add(det);
+            DetalleFacturaDTO detalleDTO = this.convertirADTO(det);
+            detalleFacturasDTO.add(detalleDTO);
         }
-        return ResponseEntity.ok(detalleFacturas1);
+        return ResponseEntity.ok(detalleFacturasDTO);
     }
 
-    public ResponseEntity<DetalleFactura> buscar(Long id){
+    public ResponseEntity<DetalleFacturaDTO> buscar(Long id){
         Optional<DetalleFactura> detalleFacturaOptional = this.detalleFacturaRepository.findById(id);
         if(detalleFacturaOptional.isPresent()){
             DetalleFactura detalleFactura = detalleFacturaOptional.get();
-            detalleFactura = DetalleFacturaUtil.calcularPrecio(detalleFactura);
-            return ResponseEntity.ok(detalleFactura);
+            DetalleFacturaDTO detalleFacturaDTO = this.convertirADTO(detalleFactura);
+            return ResponseEntity.ok(detalleFacturaDTO);
         }
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<DetalleFactura> crear(DetalleFactura detalleFactura){
+    public ResponseEntity<DetalleFacturaDTO> crear(DetalleFacturaDTO detalleFacturaDTO){
+        DetalleFactura detalleFactura = this.convertirDeDTO(detalleFacturaDTO);
         if(detalleFactura.getId() != null)
             return ResponseEntity.badRequest().build();
         Optional<Factura> optionalFactura= this.facturaRepository.findById(detalleFactura.getFactura().getId());
@@ -52,36 +54,59 @@ public class DetalleFacturaService {
             return ResponseEntity.notFound().build();
         detalleFactura.setFactura(optionalFactura.get());
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura);
-        result = DetalleFacturaUtil.calcularPrecio(result);
-        return ResponseEntity.ok(result);
+        DetalleFacturaDTO detalleFacturaDTO1 = this.convertirADTO(result);
+        return ResponseEntity.ok(detalleFacturaDTO1);
     }
 
-    public ResponseEntity<DetalleFactura> actualizar(DetalleFactura detalleFactura){
+    public ResponseEntity<DetalleFacturaDTO> actualizar(DetalleFacturaDTO detalleFacturaDTO){
+        DetalleFactura detalleFactura = this.convertirDeDTO(detalleFacturaDTO);
         if(detalleFactura.getId() == null)
             return ResponseEntity.badRequest().build();
         Optional<DetalleFactura> detalleFactura1 = this.detalleFacturaRepository.findById(detalleFactura.getId());
         if(!detalleFactura1.isPresent())
             return ResponseEntity.notFound().build();
+
         DetalleFactura detalleFactura2 = detalleFactura1.get();
         detalleFactura2.setCantidad(detalleFactura.getCantidad());
         detalleFactura2.setPrecio(detalleFactura.getPrecio());
 
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura2);
-        result = DetalleFacturaUtil.calcularPrecio(result);
-        return ResponseEntity.ok(result);
+        DetalleFacturaDTO resultDTO = this.convertirADTO(result);
+        return ResponseEntity.ok(resultDTO);
     }
 
-    public ResponseEntity<DetalleFactura> borrar(Long id){
+    public ResponseEntity<DetalleFacturaDTO> borrar(Long id){
         if(!this.detalleFacturaRepository.existsById(id))
             return ResponseEntity.notFound().build();
         this.detalleFacturaRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<DetalleFactura> borrarTodos(){
+    public ResponseEntity<DetalleFacturaDTO> borrarTodos(){
         this.detalleFacturaRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
 
+    private DetalleFacturaDTO convertirADTO(DetalleFactura detalleFactura){
+        DetalleFacturaDTO facturaDTO = new DetalleFacturaDTO();
+        facturaDTO.setFactura(detalleFactura.getFactura());
+        facturaDTO.setCantidad(detalleFactura.getCantidad());
+        facturaDTO.setId(detalleFactura.getId());
+        facturaDTO.setProducto(detalleFactura.getProducto());
+        facturaDTO.setPrecio(detalleFactura.getPrecio());
+
+        return facturaDTO;
+    }
+
+    private DetalleFactura convertirDeDTO(DetalleFacturaDTO detalleFacturaDTO){
+        DetalleFactura factura = new DetalleFactura();
+        factura.setFactura(detalleFacturaDTO.getFactura());
+        factura.setCantidad(detalleFacturaDTO.getCantidad());
+        factura.setId(detalleFacturaDTO.getId());
+        factura.setProducto(detalleFacturaDTO.getProducto());
+        factura.setPrecio(detalleFacturaDTO.getPrecio());
+
+        return factura;
+    }
 
 }
