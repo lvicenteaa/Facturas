@@ -1,5 +1,6 @@
 package tk.lvicenteaa.examples.relaciones.dto;
 
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,7 +63,11 @@ public class FacturaDTO implements Serializable {
     }
 
     public Double getCostoTotal() {
-        return costoTotal;
+        Double costo = 0.0;
+        for(DetalleFacturaDTO detalle: this.getDetalles()){
+            costo += detalle.getPrecio() * detalle.getCantidad();
+        }
+        return costo;
     }
 
     public void setCostoTotal(Double costoTotal) {
