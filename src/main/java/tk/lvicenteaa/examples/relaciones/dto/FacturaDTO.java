@@ -63,6 +63,9 @@ public class FacturaDTO implements Serializable {
     }
 
     public Double getCostoTotal() {
+        if (this.detalles == null){
+            return 0.0;
+        }
         Double costo = 0.0;
         for(DetalleFacturaDTO detalle: this.getDetalles()){
             costo += detalle.getPrecio() * detalle.getCantidad();

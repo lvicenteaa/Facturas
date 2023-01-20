@@ -10,7 +10,7 @@ import tk.lvicenteaa.examples.relaciones.service.DetalleFacturaService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/detalle")
+@RequestMapping("/api/detalles")
 public class DetalleFacturaController {
 
     @Autowired

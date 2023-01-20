@@ -10,7 +10,7 @@ import tk.lvicenteaa.examples.relaciones.service.FacturaService;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/factura")
+@RequestMapping("api/facturas")
 public class FacturaController {
 
     @Autowired

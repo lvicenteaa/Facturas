@@ -81,7 +81,7 @@ public class FacturaService {
         factura.setCliente(facturaDTO.getCliente());
         factura.setNumeroFactura(facturaDTO.getNumeroFactura());
         factura.setFecha(facturaDTO.getFecha());
-        factura.setId(facturaDTO.getId());
+        //factura.setId(facturaDTO.getId());
         //factura.setDetalles(facturaDTO.getDetalles());
         return factura;
     }
