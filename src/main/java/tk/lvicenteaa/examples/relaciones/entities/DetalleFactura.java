@@ -1,7 +1,10 @@
 package tk.lvicenteaa.examples.relaciones.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "detalles_factura")
@@ -15,10 +18,9 @@ public class DetalleFactura {
 
     private Double precio;
 
-    @Transient
-    private Double precioTotal;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "factura_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Factura factura;
 
     public DetalleFactura(Long id) {
@@ -28,12 +30,11 @@ public class DetalleFactura {
     public DetalleFactura() {
     }
 
-    public DetalleFactura(Long id, String producto, Integer cantidad, Double precio, Double precioTotal, Factura factura) {
+    public DetalleFactura(Long id, String producto, Integer cantidad, Double precio, Factura factura) {
         this.id = id;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precio = precio;
-        this.precioTotal = precioTotal;
         this.factura = factura;
     }
 
@@ -67,14 +68,6 @@ public class DetalleFactura {
 
     public void setPrecio(Double precio) {
         this.precio = precio;
-    }
-
-    public Double getPrecioTotal() {
-        return precioTotal;
-    }
-
-    public void setPrecioTotal(Double precioTotal) {
-        this.precioTotal = precioTotal;
     }
 
     public Factura getFactura() {

@@ -3,14 +3,11 @@ package tk.lvicenteaa.examples.relaciones.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import tk.lvicenteaa.examples.relaciones.dto.DetalleFacturaDTO;
 import tk.lvicenteaa.examples.relaciones.entities.DetalleFactura;
 import tk.lvicenteaa.examples.relaciones.entities.Factura;
 import tk.lvicenteaa.examples.relaciones.repository.DetalleFacturaRepository;
 import tk.lvicenteaa.examples.relaciones.repository.FacturaRepository;
-import tk.lvicenteaa.examples.relaciones.util.DetalleFacturaUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,30 +20,23 @@ public class DetalleFacturaService {
     @Autowired
     private FacturaRepository facturaRepository;
 
-    public ResponseEntity<List<DetalleFacturaDTO>> mostrarTodos(){
+    public ResponseEntity<List<DetalleFactura>> mostrarTodos(){
         List<DetalleFactura> detallesFacturas = this.detalleFacturaRepository.findAll();
         if(detallesFacturas.isEmpty())
             return ResponseEntity.noContent().build();
-        List<DetalleFacturaDTO> detalleFacturasDTO = new ArrayList<>();
-        for(DetalleFactura det : detallesFacturas) {
-            DetalleFacturaDTO detalleDTO = this.convertirADTO(det);
-            detalleFacturasDTO.add(detalleDTO);
-        }
-        return ResponseEntity.ok(detalleFacturasDTO);
+        return ResponseEntity.ok(detallesFacturas);
     }
 
-    public ResponseEntity<DetalleFacturaDTO> buscar(Long id){
+    public ResponseEntity<DetalleFactura> buscar(Long id){
         Optional<DetalleFactura> detalleFacturaOptional = this.detalleFacturaRepository.findById(id);
         if(detalleFacturaOptional.isPresent()){
             DetalleFactura detalleFactura = detalleFacturaOptional.get();
-            DetalleFacturaDTO detalleFacturaDTO = this.convertirADTO(detalleFactura);
-            return ResponseEntity.ok(detalleFacturaDTO);
+            return ResponseEntity.ok(detalleFactura);
         }
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<DetalleFacturaDTO> crear(DetalleFacturaDTO detalleFacturaDTO){
-        DetalleFactura detalleFactura = this.convertirDeDTO(detalleFacturaDTO);
+    public ResponseEntity<DetalleFactura> crear(DetalleFactura detalleFactura){
         if(detalleFactura.getId() != null)
             return ResponseEntity.badRequest().build();
         Optional<Factura> optionalFactura= this.facturaRepository.findById(detalleFactura.getFactura().getId());
@@ -54,12 +44,10 @@ public class DetalleFacturaService {
             return ResponseEntity.notFound().build();
         detalleFactura.setFactura(optionalFactura.get());
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura);
-        DetalleFacturaDTO detalleFacturaDTO1 = this.convertirADTO(result);
-        return ResponseEntity.ok(detalleFacturaDTO1);
+        return ResponseEntity.ok(result);
     }
 
-    public ResponseEntity<DetalleFacturaDTO> actualizar(DetalleFacturaDTO detalleFacturaDTO){
-        DetalleFactura detalleFactura = this.convertirDeDTO(detalleFacturaDTO);
+    public ResponseEntity<DetalleFactura> actualizar(DetalleFactura detalleFactura){
         if(detalleFactura.getId() == null)
             return ResponseEntity.badRequest().build();
         Optional<DetalleFactura> detalleFactura1 = this.detalleFacturaRepository.findById(detalleFactura.getId());
@@ -71,22 +59,22 @@ public class DetalleFacturaService {
         detalleFactura2.setPrecio(detalleFactura.getPrecio());
 
         DetalleFactura result = this.detalleFacturaRepository.save(detalleFactura2);
-        DetalleFacturaDTO resultDTO = this.convertirADTO(result);
-        return ResponseEntity.ok(resultDTO);
+        return ResponseEntity.ok(result);
     }
 
-    public ResponseEntity<DetalleFacturaDTO> borrar(Long id){
+    public ResponseEntity<DetalleFactura> borrar(Long id){
         if(!this.detalleFacturaRepository.existsById(id))
             return ResponseEntity.notFound().build();
         this.detalleFacturaRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<DetalleFacturaDTO> borrarTodos(){
+    public ResponseEntity<DetalleFactura> borrarTodos(){
         this.detalleFacturaRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
 
+    /*
     private DetalleFacturaDTO convertirADTO(DetalleFactura detalleFactura){
         DetalleFacturaDTO facturaDTO = new DetalleFacturaDTO();
         facturaDTO.setFactura(detalleFactura.getFactura());
@@ -108,5 +96,5 @@ public class DetalleFacturaService {
 
         return factura;
     }
-
+    */
 }

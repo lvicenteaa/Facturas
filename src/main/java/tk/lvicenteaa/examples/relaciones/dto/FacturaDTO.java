@@ -7,6 +7,8 @@ import java.util.List;
 
 public class FacturaDTO implements Serializable {
 
+
+
     private Long id;
     private String numeroFactura;
     private String cliente;

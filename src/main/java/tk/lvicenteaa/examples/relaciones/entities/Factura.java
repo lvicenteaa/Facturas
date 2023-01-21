@@ -13,15 +13,12 @@ public class Factura {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "numero_factura", unique = true)
     private String numeroFactura;
     private String cliente;
-
-    @Transient
-    private Double costoTotal;
     private LocalDateTime fecha;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "factura")
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL)
     private List<DetalleFactura> detalles;
 
 
@@ -32,19 +29,17 @@ public class Factura {
     public Factura() {
     }
 
-    public Factura(Long id, String numeroFactura, String cliente, Double costoTotal, LocalDateTime fecha) {
+    public Factura(Long id, String numeroFactura, String cliente, LocalDateTime fecha) {
         this.id = id;
         this.numeroFactura = numeroFactura;
         this.cliente = cliente;
-        this.costoTotal = costoTotal;
         this.fecha = fecha;
     }
 
-    public Factura(Long id, String numeroFactura, String cliente, Double costoTotal, LocalDateTime fecha, List<DetalleFactura> detalles) {
+    public Factura(Long id, String numeroFactura, String cliente, LocalDateTime fecha, List<DetalleFactura> detalles) {
         this.id = id;
         this.numeroFactura = numeroFactura;
         this.cliente = cliente;
-        this.costoTotal = costoTotal;
         this.fecha = fecha;
         this.detalles = detalles;
     }
@@ -71,14 +66,6 @@ public class Factura {
 
     public void setCliente(String cliente) {
         this.cliente = cliente;
-    }
-
-    public Double getCostoTotal() {
-        return costoTotal;
-    }
-
-    public void setCostoTotal(Double costoTotal) {
-        this.costoTotal = costoTotal;
     }
 
     public LocalDateTime getFecha() {

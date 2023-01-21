@@ -60,7 +60,7 @@ public class DetalleFacturaDTO implements Serializable {
     }
 
     public Double getPrecio() {
-        return precio;
+        return this.precio * this.cantidad;
     }
 
     public void setPrecio(Double precio) {
